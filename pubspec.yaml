@@ -1,9 +1,11 @@
 name: bin_field
 description: A Dart library for binary field operations and protocol handling.
-version: 0.0.1
+version: 0.0.2
 
 environment:
   sdk: ^3.5.4
+
+repository: https://github.com/QingmingPlusPlus/bin_field
 
 dependencies:
 
