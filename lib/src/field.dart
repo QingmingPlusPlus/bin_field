@@ -1,25 +1,78 @@
 import 'byte_utils.dart';
 
+/// Defines the data types for binary fields.
+///
+/// Used in the [Field.create] factory method to specify the type of field to create.
 enum FieldType {
+  /// Represents a 1-byte integer field
   byte,
+
+  /// Represents a 2-byte integer field
   word,
+
+  /// Represents a 4-byte integer field
   dword,
+
+  /// Represents an 8-byte integer field
   qword,
+
+  /// Represents a 4-byte floating point field
   float,
+
+  /// Represents a fixed-length string field
   string,
+
+  /// Represents a left-padded fixed-length string field, usually for removing leading zeros
   leftPadString,
+
+  /// Represents a variable-length string field where the length is determined by another field
   varString,
+
+  /// Represents a null-terminated C-style string field
   cString
 }
 
+/// Abstract base class for binary fields.
+///
+/// All concrete field types inherit from this class and implement the [getValue] method
+/// to extract specific types of values from byte data.
 abstract class Field {
+  /// The length of the field in bytes.
+  ///
+  /// For fixed-length fields, this is a constant value.
+  /// For variable-length fields (like [CStringField] or [VarStringField]), this may initially be 0.
   final int length;
+
+  /// The name of the field.
+  ///
+  /// Used to identify the field during parsing.
   final String name;
 
+  /// Extracts the field's value from raw byte data.
+  ///
+  /// [data] The byte array containing the data to parse.
+  ///
+  /// Returns the parsed value, type depends on the specific field implementation.
   getValue(List<int> data);
 
+  /// Creates a field instance.
+  ///
+  /// [length] The length of the field in bytes.
+  /// [name] The name of the field.
   const Field({required this.length, required this.name});
 
+  /// Creates a field instance based on the specified type.
+  ///
+  /// This factory method simplifies the process of creating different types of fields.
+  ///
+  /// [type] The type of field to create, from the [FieldType] enum.
+  /// [name] The name of the field.
+  /// [length] The length of the field in bytes, only used for field types that require a specified length.
+  /// [lengthField] For [VarStringField], specifies the name of the field that contains length information.
+  ///
+  /// Returns the created field instance.
+  ///
+  /// Throws an exception if an unsupported field type is specified.
   factory Field.create({
     required FieldType type,
     required String name,
@@ -49,10 +102,23 @@ abstract class Field {
   }
 }
 
+/// Represents a 1-byte unsigned integer field.
+///
+/// Value range: 0-255
 class ByteField extends Field {
+  /// Creates a byte field.
+  ///
+  /// [name] The name of the field.
   ByteField({required super.name}) : super(length: 1);
 
   @override
+
+  /// Extracts a single byte value from the byte data.
+  ///
+  /// [data] Data containing at least 1 byte.
+  ///
+  /// Returns the first byte as an integer value.
+  /// Throws an exception if the data is empty.
   int getValue(List<int> data) {
     if (data.isEmpty) {
       throw Exception('Data is empty');
@@ -61,10 +127,24 @@ class ByteField extends Field {
   }
 }
 
+/// Represents a 2-byte unsigned integer (word) field.
+///
+/// Value range: 0-65535
+/// Uses big-endian byte order (most significant byte first).
 class WordField extends Field {
+  /// Creates a word field.
+  ///
+  /// [name] The name of the field.
   WordField({required super.name}) : super(length: 2);
 
   @override
+
+  /// Extracts a 2-byte integer value from the byte data.
+  ///
+  /// [data] Data containing at least 2 bytes.
+  ///
+  /// Returns a 16-bit integer value composed of the first two bytes (big-endian).
+  /// Throws an exception if the data length is less than 2.
   int getValue(List<int> data) {
     if (data.length < 2) {
       throw Exception('Data length is less than 2');
@@ -73,10 +153,24 @@ class WordField extends Field {
   }
 }
 
+/// Represents a 4-byte unsigned integer (double word) field.
+///
+/// Value range: 0-4,294,967,295
+/// Uses big-endian byte order (most significant byte first).
 class DwordField extends Field {
+  /// Creates a double word field.
+  ///
+  /// [name] The name of the field.
   DwordField({required super.name}) : super(length: 4);
 
   @override
+
+  /// Extracts a 4-byte integer value from the byte data.
+  ///
+  /// [data] Data containing at least 4 bytes.
+  ///
+  /// Returns a 32-bit integer value composed of the first four bytes (big-endian).
+  /// Throws an exception if the data length is less than 4.
   int getValue(List<int> data) {
     if (data.length < 4) {
       throw Exception('Data length is less than 4');
@@ -85,10 +179,24 @@ class DwordField extends Field {
   }
 }
 
+/// Represents an 8-byte unsigned integer (quad word) field.
+///
+/// Value range: 0-18,446,744,073,709,551,615
+/// Uses big-endian byte order (most significant byte first).
 class QwordField extends Field {
+  /// Creates a quad word field.
+  ///
+  /// [name] The name of the field.
   QwordField({required super.name}) : super(length: 8);
 
   @override
+
+  /// Extracts an 8-byte integer value from the byte data.
+  ///
+  /// [data] Data containing at least 8 bytes.
+  ///
+  /// Returns a 64-bit integer value composed of the first eight bytes (big-endian).
+  /// Throws an exception if the data length is less than 8.
   int getValue(List<int> data) {
     if (data.length < 8) {
       throw Exception('Data length is less than 8');
@@ -104,10 +212,23 @@ class QwordField extends Field {
   }
 }
 
+/// Represents a 4-byte IEEE 754 floating point field.
+///
+/// Uses the standard IEEE 754 single-precision format.
 class FloatField extends Field {
+  /// Creates a float field.
+  ///
+  /// [name] The name of the field.
   FloatField({required super.name}) : super(length: 4);
 
   @override
+
+  /// Extracts a floating point value from the byte data.
+  ///
+  /// [data] Data containing at least 4 bytes.
+  ///
+  /// Returns a double value converted from the IEEE 754 single-precision representation.
+  /// Throws an exception if the data length is less than 4.
   double getValue(List<int> data) {
     if (data.length < 4) {
       throw Exception('Data length is less than 4');
@@ -117,24 +238,52 @@ class FloatField extends Field {
   }
 }
 
+/// Represents a fixed-length string field.
+///
+/// The string is decoded from the byte data using UTF-8 encoding.
 class StringField extends Field {
+  /// Creates a string field with a fixed length.
+  ///
+  /// [length] The fixed length of the string in bytes.
+  /// [name] The name of the field.
   StringField({required super.length, required super.name});
 
   @override
+
+  /// Extracts a string value from the byte data.
+  ///
+  /// [data] The byte array containing the string data.
+  ///
+  /// Returns the string decoded from the byte data.
   String getValue(List<int> data) {
     return String.fromCharCodes(data);
   }
 }
 
+/// Represents a fixed-length string field with left padding.
+///
+/// This field type is used for strings that are padded with zeros on the left side.
+/// When parsing, the leading zeros are removed before converting to a string.
 class LeftPadStringField extends Field {
+  /// Creates a left-padded string field with a fixed length.
+  ///
+  /// [length] The fixed length of the string in bytes, including padding.
+  /// [name] The name of the field.
   LeftPadStringField({required super.length, required super.name});
 
   @override
+
+  /// Extracts a string value from the byte data, removing leading zeros.
+  ///
+  /// [data] The byte array containing the string data with potential leading zeros.
+  ///
+  /// Returns the string decoded from the byte data after removing leading zeros.
+  /// Throws an exception if the data length is less than the expected length.
   String getValue(List<int> data) {
     if (data.length < length) {
       throw Exception('Data length is less than expected');
     }
-    //去除前面左补的0
+    // Remove leading zeros
     int start = data.indexWhere((byte) => byte != 0);
     if (start == -1) {
       start = 0;
@@ -144,29 +293,62 @@ class LeftPadStringField extends Field {
   }
 }
 
+/// Represents a variable-length string field.
+///
+/// The length of this string is determined by another field in the protocol.
 class VarStringField extends Field {
-  final String lengthField; // 指定长度的字段名
+  /// The name of the field that specifies the length of this string.
+  final String lengthField;
 
+  /// Creates a variable-length string field.
+  ///
+  /// [name] The name of the field.
+  /// [lengthField] The name of another field that contains the length of this string.
   VarStringField({required super.name, required this.lengthField})
-      : super(length: 0); // 初始长度为0，实际长度会在解析时根据lengthField确定
+      : super(
+            length:
+                0); // Initial length is 0, actual length will be determined during parsing based on lengthField
 
   @override
+
+  /// Extracts a string value from the byte data.
+  ///
+  /// [data] The byte array containing the string data.
+  ///
+  /// Returns the string decoded from the byte data.
+  /// Note: The actual parsing logic will be handled in ProtocolParser,
+  /// as this method cannot access the values of other fields.
   String getValue(List<int> data) {
-    // 实际的getValue逻辑将在ProtocolParser中处理
-    // 因为这里不能访问到其他字段的值
+    // The actual getValue logic will be handled in ProtocolParser
+    // because we can't access other field values here
     return String.fromCharCodes(data);
   }
 }
 
+/// Represents a null-terminated C-style string field.
+///
+/// This field reads characters until a null terminator (byte value 0) is encountered.
+/// The length of this field is determined during parsing by locating the null terminator.
 class CStringField extends Field {
-  CStringField({required super.name}) : super(length: 0); // 长度在解析时确定
+  /// Creates a C-style string field.
+  ///
+  /// [name] The name of the field.
+  CStringField({required super.name})
+      : super(length: 0); // Length is determined during parsing
 
   @override
+
+  /// Extracts a null-terminated string value from the byte data.
+  ///
+  /// [data] The byte array containing the string data with a null terminator.
+  ///
+  /// Returns the string decoded from the byte data up to the null terminator.
+  /// If no null terminator is found, uses the entire data.
   String getValue(List<int> data) {
-    // 寻找结束符'\0'的位置
+    // Find the position of the null terminator
     int endIndex = data.indexOf(0);
     if (endIndex == -1) {
-      // 如果没有找到结束符，使用整个数据
+      // If no null terminator is found, use the entire data
       endIndex = data.length;
     }
     return String.fromCharCodes(data.sublist(0, endIndex));
