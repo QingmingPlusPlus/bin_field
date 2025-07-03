@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="bin_field API docs, for the Dart programming language.">
+  <title>bin_field - Dart API docs</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="static-assets/github.css?v1">
+  <link rel="stylesheet" href="static-assets/styles.css?v1">
+  <link rel="icon" href="static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li class="self-crumb">bin_field package</li>
+  </ol>
+  <div class="self-name">bin_field</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+  <div id="dartdoc-main-content" class="main-content">
+      
+<section class="desc markdown">
+  <h1 id="bin_field">bin_field</h1>
+<blockquote>
+<p>⚠️ <strong>Note: This library is still under development, and the API may change at any time. Currently, only Big Endian is supported!</strong></p>
+</blockquote>
+<blockquote>
+<p>⚠️ <strong>注意：本库仍处于开发阶段，API 可能随时变动。当前仅支持大端字节序（Big Endian）！</strong></p>
+</blockquote>
+<p><a href="./README.en.md">English</a> | <a href="./README.zh.md">中文</a></p>
+<h2 id="overview--">Overview / 概述</h2>
+<p><code>bin_field</code> is a Dart library for parsing binary data with a declarative approach. It allows you to define binary protocol structures using field definitions and automatically handle the parsing of binary messages into structured data. The library supports various field types including integers of different sizes (byte, word, dword, qword), floating-point numbers, fixed-length strings, variable-length strings, and null-terminated C-style strings, all in big-endian byte order.</p>
+<p><code>bin_field</code> 是一个用于以声明式方式解析二进制数据的 Dart 库。它允许您使用字段定义来描述二进制协议结构，并自动将二进制消息解析为结构化数据。该库支持多种字段类型，包括不同大小的整数（byte、word、dword、qword）、浮点数、固定长度字符串、变长字符串和以空字符结尾的 C 风格字符串，所有这些都采用大端字节序。</p>
+<h2 id="key-features--">Key Features / 主要特性</h2>
+<ul>
+<li>
+<p><strong>Declarative API</strong>: Define your binary protocol structure using field definitions</p>
+</li>
+<li>
+<p><strong>Multiple Data Types</strong>: Support for various integer sizes, floating-point numbers, and string types</p>
+</li>
+<li>
+<p><strong>Flexible Parsing</strong>: Handle fixed-length fields, variable-length fields, and null-terminated strings</p>
+</li>
+<li>
+<p><strong>Easy Integration</strong>: Mix the <code>ProtocolParser</code> into your classes for automatic binary data parsing</p>
+</li>
+<li>
+<p><strong>Type-Safe Access</strong>: Retrieve parsed values with their proper types</p>
+</li>
+<li>
+<p><strong>声明式 API</strong>：使用字段定义描述您的二进制协议结构</p>
+</li>
+<li>
+<p><strong>多种数据类型</strong>：支持各种大小的整数、浮点数和字符串类型</p>
+</li>
+<li>
+<p><strong>灵活的解析</strong>：处理固定长度字段、变长字段和以空字符结尾的字符串</p>
+</li>
+<li>
+<p><strong>易于集成</strong>：将 <code>ProtocolParser</code> 混入到您的类中，实现自动二进制数据解析</p>
+</li>
+<li>
+<p><strong>类型安全访问</strong>：以正确的类型检索解析后的值</p>
+</li>
+</ul>
+</section>
+
+
+      <section class="summary">
+          <h2>Libraries</h2>
+        <dl>
+          <dt id="bin_field">
+  <span class="name"><a href="bin_field/">bin_field</a></span> 
+
+</dt>
+<dd>Support for doing something awesome.
+</dd>
+
+        </dl>
+      </section>
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li class="self-crumb">bin_field package</li>
+</ol>
+
+    <h5 class="hidden-xs"><span class="package-name">bin_field</span> <span class="package-kind">package</span></h5>
+    <ol>
+      <li class="section-title">Libraries</li>
+      <li><a href="bin_field/">bin_field</a></li>
+</ol>
+
+  </div>
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div>
+</main>
+<footer>
+  <span class="no-break">
+    bin_field
+      0.0.2
+  </span>
+  
+</footer>
+
+
+<script src="static-assets/highlight.pack.js?v1"></script>
+<script src="static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+
