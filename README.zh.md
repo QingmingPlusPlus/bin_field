@@ -75,9 +75,46 @@ class LittleEndianMessage with ProtocolParser {
         DwordField(name: 'le-dword', endian: Endian.little),
       ];
 
+
   int get leWord => getValue('le-word');
   int get leDword => getValue('le-dword');
 }
+```
 
+## 自定义字段类型
+
+你可以通过继承 `Field` 和 `FieldType` 来定义自己的字段类型。
+
+```dart
+// 1. 定义你的自定义字段
+class MyCustomField extends Field {
+  MyCustomField({required super.name, super.endian}) : super(length: 3);
+
+  @override
+  int getValue(List<int> data) {
+    // 实现你的解析逻辑
+    return 42; 
+  }
+}
+
+// 2. 定义对应的 FieldType
+class MyCustomFieldType implements FieldType {
+  const MyCustomFieldType();
+
+  @override
+  Field create(String name,
+      {int length = 0, String? lengthField, Endian endian = Endian.big}) {
+    return MyCustomField(name: name, endian: endian);
+  }
+}
+
+// 3. 使用 Field.create 创建
+class MyMessage with ProtocolParser {
+   // ...
+   @override
+   List<Field> get fields => [
+     Field.create(type: MyCustomFieldType(), name: 'custom'),
+   ];
+}
 ```
 

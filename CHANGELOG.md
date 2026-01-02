@@ -1,3 +1,8 @@
+## 0.0.4
+
+- Refactor `FieldType` to an abstract class to support custom field types.
+- Add `Field.create` support for custom types.
+
 ## 0.0.3
 
 - Add support for Little Endian.

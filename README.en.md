@@ -65,3 +65,40 @@ void main() {
 }
 ```
 
+## Custom Field Types
+
+You can define your own field types by extending `Field` and `FieldType`.
+
+```dart
+// 1. Define your custom field
+class MyCustomField extends Field {
+  MyCustomField({required super.name, super.endian}) : super(length: 3);
+
+  @override
+  int getValue(List<int> data) {
+    // Implement your parsing logic
+    return 42; 
+  }
+}
+
+// 2. Define the FieldType for it
+class MyCustomFieldType implements FieldType {
+  const MyCustomFieldType();
+
+  @override
+  Field create(String name,
+      {int length = 0, String? lengthField, Endian endian = Endian.big}) {
+    return MyCustomField(name: name, endian: endian);
+  }
+}
+
+// 3. Use it with Field.create
+class MyMessage with ProtocolParser {
+   // ...
+   @override
+   List<Field> get fields => [
+     Field.create(type: MyCustomFieldType(), name: 'custom'),
+   ];
+}
+```
+

@@ -5,33 +5,123 @@ import 'byte_utils.dart';
 /// Defines the data types for binary fields.
 ///
 /// Used in the [Field.create] factory method to specify the type of field to create.
-enum FieldType {
+abstract class FieldType {
+  /// Creates a field instance of this type.
+  Field create(
+    String name, {
+    int length = 0,
+    String? lengthField,
+    Endian endian = Endian.big,
+  });
+
   /// Represents a 1-byte integer field
-  byte,
+  static const FieldType byte = _ByteType();
 
   /// Represents a 2-byte integer field
-  word,
+  static const FieldType word = _WordType();
 
   /// Represents a 4-byte integer field
-  dword,
+  static const FieldType dword = _DwordType();
 
   /// Represents an 8-byte integer field
-  qword,
+  static const FieldType qword = _QwordType();
 
   /// Represents a 4-byte floating point field
-  float,
+  static const FieldType float = _FloatType();
 
   /// Represents a fixed-length string field
-  string,
+  static const FieldType string = _StringType();
 
   /// Represents a left-padded fixed-length string field, usually for removing leading zeros
-  leftPadString,
+  static const FieldType leftPadString = _LeftPadStringType();
 
   /// Represents a variable-length string field where the length is determined by another field
-  varString,
+  static const FieldType varString = _VarStringType();
 
   /// Represents a null-terminated C-style string field
-  cString
+  static const FieldType cString = _CStringType();
+}
+
+class _ByteType implements FieldType {
+  const _ByteType();
+  @override
+  Field create(String name,
+      {int length = 0, String? lengthField, Endian endian = Endian.big}) {
+    return ByteField(name: name, endian: endian);
+  }
+}
+
+class _WordType implements FieldType {
+  const _WordType();
+  @override
+  Field create(String name,
+      {int length = 0, String? lengthField, Endian endian = Endian.big}) {
+    return WordField(name: name, endian: endian);
+  }
+}
+
+class _DwordType implements FieldType {
+  const _DwordType();
+  @override
+  Field create(String name,
+      {int length = 0, String? lengthField, Endian endian = Endian.big}) {
+    return DwordField(name: name, endian: endian);
+  }
+}
+
+class _QwordType implements FieldType {
+  const _QwordType();
+  @override
+  Field create(String name,
+      {int length = 0, String? lengthField, Endian endian = Endian.big}) {
+    return QwordField(name: name, endian: endian);
+  }
+}
+
+class _FloatType implements FieldType {
+  const _FloatType();
+  @override
+  Field create(String name,
+      {int length = 0, String? lengthField, Endian endian = Endian.big}) {
+    return FloatField(name: name, endian: endian);
+  }
+}
+
+class _StringType implements FieldType {
+  const _StringType();
+  @override
+  Field create(String name,
+      {int length = 0, String? lengthField, Endian endian = Endian.big}) {
+    return StringField(name: name, length: length, endian: endian);
+  }
+}
+
+class _LeftPadStringType implements FieldType {
+  const _LeftPadStringType();
+  @override
+  Field create(String name,
+      {int length = 0, String? lengthField, Endian endian = Endian.big}) {
+    return LeftPadStringField(name: name, length: length, endian: endian);
+  }
+}
+
+class _VarStringType implements FieldType {
+  const _VarStringType();
+  @override
+  Field create(String name,
+      {int length = 0, String? lengthField, Endian endian = Endian.big}) {
+    return VarStringField(
+        name: name, lengthField: lengthField ?? '', endian: endian);
+  }
+}
+
+class _CStringType implements FieldType {
+  const _CStringType();
+  @override
+  Field create(String name,
+      {int length = 0, String? lengthField, Endian endian = Endian.big}) {
+    return CStringField(name: name, endian: endian);
+  }
 }
 
 /// Abstract base class for binary fields.
@@ -75,15 +165,13 @@ abstract class Field {
   ///
   /// This factory method simplifies the process of creating different types of fields.
   ///
-  /// [type] The type of field to create, from the [FieldType] enum.
+  /// [type] The type of field to create, which must be a subclass of [FieldType].
   /// [name] The name of the field.
   /// [length] The length of the field in bytes, only used for field types that require a specified length.
   /// [lengthField] For [VarStringField], specifies the name of the field that contains length information.
   /// [endian] The endianness of the field (default is Big Endian).
   ///
   /// Returns the created field instance.
-  ///
-  /// Throws an exception if an unsupported field type is specified.
   factory Field.create({
     required FieldType type,
     required String name,
@@ -91,27 +179,8 @@ abstract class Field {
     String? lengthField,
     Endian endian = Endian.big,
   }) {
-    switch (type) {
-      case FieldType.byte:
-        return ByteField(name: name, endian: endian);
-      case FieldType.word:
-        return WordField(name: name, endian: endian);
-      case FieldType.dword:
-        return DwordField(name: name, endian: endian);
-      case FieldType.qword:
-        return QwordField(name: name, endian: endian);
-      case FieldType.float:
-        return FloatField(name: name, endian: endian);
-      case FieldType.string:
-        return StringField(name: name, length: length, endian: endian);
-      case FieldType.leftPadString:
-        return LeftPadStringField(name: name, length: length, endian: endian);
-      case FieldType.varString:
-        return VarStringField(
-            name: name, lengthField: lengthField ?? '', endian: endian);
-      case FieldType.cString:
-        return CStringField(name: name, endian: endian);
-    }
+    return type.create(name,
+        length: length, lengthField: lengthField, endian: endian);
   }
 }
 
