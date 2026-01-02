@@ -1,15 +1,21 @@
 # bin_field
-> ⚠️ **Note: This library is still under development, and the API may change at any time. Currently, only Big Endian is supported!**
+> ⚠️ **Note: This library is still in development, API may change at any time.**
 
-> ⚠️ **注意：本库仍处于开发阶段，API 可能随时变动。当前仅支持大端字节序（Big Endian）！**
 
 [English](./README.en.md) | [中文](./README.zh.md)
 
 ## Overview / 概述
 
-`bin_field` is a Dart library for parsing binary data with a declarative approach. It allows you to define binary protocol structures using field definitions and automatically handle the parsing of binary messages into structured data. The library supports various field types including integers of different sizes (byte, word, dword, qword), floating-point numbers, fixed-length strings, variable-length strings, and null-terminated C-style strings, all in big-endian byte order.
+`bin_field` is a Dart library for parsing binary data with a declarative approach. It allows you to define binary protocol structures using field definitions and automatically handle the parsing of binary messages into structured data.
 
-`bin_field` 是一个用于以声明式方式解析二进制数据的 Dart 库。它允许您使用字段定义来描述二进制协议结构，并自动将二进制消息解析为结构化数据。该库支持多种字段类型，包括不同大小的整数（byte、word、dword、qword）、浮点数、固定长度字符串、变长字符串和以空字符结尾的 C 风格字符串，所有这些都采用大端字节序。
+## Key Features
+
+- Support common binary field types (Byte, Word, Dword, Qword, Float, Fixed/Variable length String, C-style String, etc.)
+- Declarative field parsing, easy to extend
+- Automatic parsing of protocol messages and field mapping
+- Support Big Endian and Little Endian configuration
+
+`bin_field` 是一个用于以声明式方式解析二进制数据的 Dart 库。它允许您使用字段定义来描述二进制协议结构，并自动将二进制消息解析为结构化数据。该库支持多种字段类型，包括不同大小的整数（byte、word、dword、qword）、浮点数、固定长度字符串、变长字符串和以空字符结尾的 C 风格字符串。
 
 ## Key Features / 主要特性
 

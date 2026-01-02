@@ -1,6 +1,6 @@
 # bin_field
 
-> ⚠️ **注意：本库仍处于开发阶段，API 可能随时变动。当前仅支持大端字节序（Big Endian）！**
+> ⚠️ **注意：本库仍处于开发阶段，API 可能随时变动。**
 
 [English](./README.en.md) | [中文](./README.zh.md)
 
@@ -11,7 +11,7 @@
 - 支持常见二进制字段类型（Byte、Word、Dword、Qword、Float、定长/变长/左补零字符串、C风格字符串等）
 - 字段解析采用声明式方式，易于扩展
 - 支持协议消息的自动解析与字段映射
-- 仅支持大端字节序（Big Endian）
+- 支持大端序（Big Endian）和小端序（Little Endian）配置
 
 ## 安装
 
@@ -61,6 +61,23 @@ void main() {
   print('Body Length: ${message.bodyLength}');
   print('Body: ${message.body}');
   print('CRC: ${message.crc}');
+  print('CRC: ${message.crc}');
 }
+
+class LittleEndianMessage with ProtocolParser {
+  @override
+  final List<int> content;
+  LittleEndianMessage(this.content);
+
+  @override
+  List<Field> get fields => [
+        WordField(name: 'le-word', endian: Endian.little),
+        DwordField(name: 'le-dword', endian: Endian.little),
+      ];
+
+  int get leWord => getValue('le-word');
+  int get leDword => getValue('le-dword');
+}
+
 ```
 

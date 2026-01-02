@@ -14,10 +14,10 @@ import 'dart:typed_data';
 /// final bytes = [0x41, 0x20, 0x00, 0x00]; // Represents 10.0 in IEEE 754
 /// final value = bytesToFloat(bytes); // Returns 10.0
 /// ```
-double bytesToFloat(List<int> bytes) {
+double bytesToFloat(List<int> bytes, [Endian endian = Endian.big]) {
   final byteData = ByteData(4);
   for (int i = 0; i < 4; i++) {
     byteData.setUint8(i, bytes[i]);
   }
-  return byteData.getFloat32(0, Endian.big);
+  return byteData.getFloat32(0, endian);
 }

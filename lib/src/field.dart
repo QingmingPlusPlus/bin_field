@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'byte_utils.dart';
 
 /// Defines the data types for binary fields.
@@ -48,6 +50,9 @@ abstract class Field {
   /// Used to identify the field during parsing.
   final String name;
 
+  /// The endianness of the field (Big Endian or Little Endian).
+  final Endian endian;
+
   /// Extracts the field's value from raw byte data.
   ///
   /// [data] The byte array containing the data to parse.
@@ -59,7 +64,12 @@ abstract class Field {
   ///
   /// [length] The length of the field in bytes.
   /// [name] The name of the field.
-  const Field({required this.length, required this.name});
+  /// [endian] The endianness of the field (default is Big Endian).
+  const Field({
+    required this.length,
+    required this.name,
+    this.endian = Endian.big,
+  });
 
   /// Creates a field instance based on the specified type.
   ///
@@ -69,6 +79,7 @@ abstract class Field {
   /// [name] The name of the field.
   /// [length] The length of the field in bytes, only used for field types that require a specified length.
   /// [lengthField] For [VarStringField], specifies the name of the field that contains length information.
+  /// [endian] The endianness of the field (default is Big Endian).
   ///
   /// Returns the created field instance.
   ///
@@ -78,24 +89,28 @@ abstract class Field {
     required String name,
     int length = 0,
     String? lengthField,
+    Endian endian = Endian.big,
   }) {
     switch (type) {
       case FieldType.byte:
-        return ByteField(name: name);
+        return ByteField(name: name, endian: endian);
       case FieldType.word:
-        return WordField(name: name);
+        return WordField(name: name, endian: endian);
       case FieldType.dword:
-        return DwordField(name: name);
+        return DwordField(name: name, endian: endian);
       case FieldType.qword:
-        return QwordField(name: name);
+        return QwordField(name: name, endian: endian);
+      case FieldType.float:
+        return FloatField(name: name, endian: endian);
       case FieldType.string:
-        return StringField(name: name, length: length);
+        return StringField(name: name, length: length, endian: endian);
       case FieldType.leftPadString:
-        return LeftPadStringField(name: name, length: length);
+        return LeftPadStringField(name: name, length: length, endian: endian);
       case FieldType.varString:
-        return VarStringField(name: name, lengthField: lengthField ?? '');
+        return VarStringField(
+            name: name, lengthField: lengthField ?? '', endian: endian);
       case FieldType.cString:
-        return CStringField(name: name);
+        return CStringField(name: name, endian: endian);
       default:
         throw Exception('Unsupported field type');
     }
@@ -109,7 +124,8 @@ class ByteField extends Field {
   /// Creates a byte field.
   ///
   /// [name] The name of the field.
-  ByteField({required super.name}) : super(length: 1);
+  /// [endian] The endianness of the field (default is Big Endian).
+  ByteField({required super.name, super.endian}) : super(length: 1);
 
   @override
 
@@ -130,12 +146,13 @@ class ByteField extends Field {
 /// Represents a 2-byte unsigned integer (word) field.
 ///
 /// Value range: 0-65535
-/// Uses big-endian byte order (most significant byte first).
+/// Uses specified byte order.
 class WordField extends Field {
   /// Creates a word field.
   ///
   /// [name] The name of the field.
-  WordField({required super.name}) : super(length: 2);
+  /// [endian] The endianness of the field (default is Big Endian).
+  WordField({required super.name, super.endian}) : super(length: 2);
 
   @override
 
@@ -143,11 +160,14 @@ class WordField extends Field {
   ///
   /// [data] Data containing at least 2 bytes.
   ///
-  /// Returns a 16-bit integer value composed of the first two bytes (big-endian).
+  /// Returns a 16-bit integer value composed of the first two bytes according to endianness.
   /// Throws an exception if the data length is less than 2.
   int getValue(List<int> data) {
     if (data.length < 2) {
       throw Exception('Data length is less than 2');
+    }
+    if (endian == Endian.little) {
+      return (data[1] << 8) | data[0];
     }
     return (data[0] << 8) | data[1];
   }
@@ -156,12 +176,13 @@ class WordField extends Field {
 /// Represents a 4-byte unsigned integer (double word) field.
 ///
 /// Value range: 0-4,294,967,295
-/// Uses big-endian byte order (most significant byte first).
+/// Uses specified byte order.
 class DwordField extends Field {
   /// Creates a double word field.
   ///
   /// [name] The name of the field.
-  DwordField({required super.name}) : super(length: 4);
+  /// [endian] The endianness of the field (default is Big Endian).
+  DwordField({required super.name, super.endian}) : super(length: 4);
 
   @override
 
@@ -169,11 +190,14 @@ class DwordField extends Field {
   ///
   /// [data] Data containing at least 4 bytes.
   ///
-  /// Returns a 32-bit integer value composed of the first four bytes (big-endian).
+  /// Returns a 32-bit integer value composed of the first four bytes according to endianness.
   /// Throws an exception if the data length is less than 4.
   int getValue(List<int> data) {
     if (data.length < 4) {
       throw Exception('Data length is less than 4');
+    }
+    if (endian == Endian.little) {
+      return (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
     }
     return (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | data[3];
   }
@@ -182,12 +206,13 @@ class DwordField extends Field {
 /// Represents an 8-byte unsigned integer (quad word) field.
 ///
 /// Value range: 0-18,446,744,073,709,551,615
-/// Uses big-endian byte order (most significant byte first).
+/// Uses specified byte order.
 class QwordField extends Field {
   /// Creates a quad word field.
   ///
   /// [name] The name of the field.
-  QwordField({required super.name}) : super(length: 8);
+  /// [endian] The endianness of the field (default is Big Endian).
+  QwordField({required super.name, super.endian}) : super(length: 8);
 
   @override
 
@@ -195,11 +220,21 @@ class QwordField extends Field {
   ///
   /// [data] Data containing at least 8 bytes.
   ///
-  /// Returns a 64-bit integer value composed of the first eight bytes (big-endian).
+  /// Returns a 64-bit integer value composed of the first eight bytes according to endianness.
   /// Throws an exception if the data length is less than 8.
   int getValue(List<int> data) {
     if (data.length < 8) {
       throw Exception('Data length is less than 8');
+    }
+    if (endian == Endian.little) {
+      return (data[7] << 56) |
+          (data[6] << 48) |
+          (data[5] << 40) |
+          (data[4] << 32) |
+          (data[3] << 24) |
+          (data[2] << 16) |
+          (data[1] << 8) |
+          data[0];
     }
     return (data[0] << 56) |
         (data[1] << 48) |
@@ -219,7 +254,8 @@ class FloatField extends Field {
   /// Creates a float field.
   ///
   /// [name] The name of the field.
-  FloatField({required super.name}) : super(length: 4);
+  /// [endian] The endianness of the field (default is Big Endian).
+  FloatField({required super.name, super.endian}) : super(length: 4);
 
   @override
 
@@ -234,7 +270,7 @@ class FloatField extends Field {
       throw Exception('Data length is less than 4');
     }
     final bytes = data.sublist(0, 4);
-    return bytesToFloat(bytes);
+    return bytesToFloat(bytes, endian);
   }
 }
 
@@ -246,7 +282,8 @@ class StringField extends Field {
   ///
   /// [length] The fixed length of the string in bytes.
   /// [name] The name of the field.
-  StringField({required super.length, required super.name});
+  /// [endian] The endianness of the field (default is Big Endian).
+  StringField({required super.length, required super.name, super.endian});
 
   @override
 
@@ -269,7 +306,9 @@ class LeftPadStringField extends Field {
   ///
   /// [length] The fixed length of the string in bytes, including padding.
   /// [name] The name of the field.
-  LeftPadStringField({required super.length, required super.name});
+  /// [endian] The endianness of the field (default is Big Endian).
+  LeftPadStringField(
+      {required super.length, required super.name, super.endian});
 
   @override
 
@@ -304,7 +343,8 @@ class VarStringField extends Field {
   ///
   /// [name] The name of the field.
   /// [lengthField] The name of another field that contains the length of this string.
-  VarStringField({required super.name, required this.lengthField})
+  /// [endian] The endianness of the field (default is Big Endian).
+  VarStringField({required super.name, required this.lengthField, super.endian})
       : super(
             length:
                 0); // Initial length is 0, actual length will be determined during parsing based on lengthField
@@ -333,7 +373,8 @@ class CStringField extends Field {
   /// Creates a C-style string field.
   ///
   /// [name] The name of the field.
-  CStringField({required super.name})
+  /// [endian] The endianness of the field (default is Big Endian).
+  CStringField({required super.name, super.endian})
       : super(length: 0); // Length is determined during parsing
 
   @override
