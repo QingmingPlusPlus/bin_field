@@ -111,8 +111,6 @@ abstract class Field {
             name: name, lengthField: lengthField ?? '', endian: endian);
       case FieldType.cString:
         return CStringField(name: name, endian: endian);
-      default:
-        throw Exception('Unsupported field type');
     }
   }
 }
